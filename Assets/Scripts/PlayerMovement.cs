@@ -7,6 +7,9 @@ public class PlayerMovement : MonoBehaviour
     public float walkSpeed = 5f;
     public float sprintSpeed = 9f;
 
+    [Header("Rotation Settings")]
+    public float rotationSpeed = 120f; // Grad pro Sekunde
+
     [Header("Ground Check")]
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -23,7 +26,6 @@ public class PlayerMovement : MonoBehaviour
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
 
-        animator.SetFloat("InputX", 0f);
         animator.SetFloat("InputY", 0f);
         animator.SetFloat("InputMagnitude", 0f);
         animator.SetBool("isSprinting", false);
@@ -39,26 +41,30 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // --- 2. Eingaben lesen ---
-        float inputX = Input.GetAxis("Horizontal");
-        float inputY = Input.GetAxis("Vertical");
+        float inputX = Input.GetAxis("Horizontal"); // A/D = drehen
+        float inputY = Input.GetAxis("Vertical");   // W/S = laufen
 
-        // --- 3. Sprint-Check ---
+        // --- 3. Sprint ---
         bool isSprinting = Input.GetKey(KeyCode.LeftShift);
-
-        // --- 4. Bewegung berechnen ---
-        Vector3 move = transform.right * inputX + transform.forward * inputY;
-        float inputMagnitude = new Vector2(inputX, inputY).magnitude;
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
+        // --- 4. Bewegung ---
+        Vector3 move = transform.forward * Mathf.Clamp(inputY, -1f, 1f);
         controller.Move(move * currentSpeed * Time.deltaTime);
 
-        // --- 5. Animator füttern ---
-        animator.SetFloat("InputX", inputX);
+        // --- 5. Rotation mit A/D ---
+        if (Mathf.Abs(inputX) > 0.1f)
+        {
+            transform.Rotate(Vector3.up, inputX * rotationSpeed * Time.deltaTime);
+        }
+
+        // --- 6. Animation ---
+        float inputMagnitude = Mathf.Abs(inputY);
         animator.SetFloat("InputY", inputY);
         animator.SetFloat("InputMagnitude", inputMagnitude);
         animator.SetBool("isSprinting", isSprinting);
 
-        // --- 6. Gravity anwenden ---
+        // --- 7. Gravity ---
         velocity.y += Physics.gravity.y * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
     }
