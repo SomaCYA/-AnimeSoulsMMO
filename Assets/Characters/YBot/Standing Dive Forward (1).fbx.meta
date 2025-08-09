@@ -36,10 +36,10 @@ ModelImporter:
       name: mixamo.com
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 49
+      firstFrame: 0.6
+      lastFrame: 45
       wrapMode: 0
-      orientationOffsetY: -0.45
+      orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
